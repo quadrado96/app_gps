@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         val btnIniciar = findViewById<Button>(R.id.btn_iniciar)
         val btnEncerrar = findViewById<Button>(R.id.btn_encerrar)
+        val btnDownload = findViewById<Button>(R.id.btn_download)
 
         btnIniciar.setOnClickListener {
             status = "Iniciado"
@@ -44,5 +45,10 @@ class MainActivity : AppCompatActivity() {
             tvStatus.setTextColor(ContextCompat.getColor(this, R.color.vermelho))
         }
 
+        btnDownload.setOnClickListener {
+            status = "Download realizado."
+            tvStatus.text = "Status: $status"
+            tvStatus.setTextColor(ContextCompat.getColor(this, R.color.azul))
+        }
     }
 }
