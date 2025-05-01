@@ -37,6 +37,7 @@ android {
 
 dependencies {
 
+    implementation("org.osmdroid:osmdroid-android:6.1.16")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.core.ktx)
@@ -44,6 +45,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
