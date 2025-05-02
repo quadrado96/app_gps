@@ -48,9 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnEncerrar.setOnClickListener {
-            status = "Encerrado"
-            tvStatus.text = "Status: $status"
-            tvStatus.setTextColor(ContextCompat.getColor(this, R.color.vermelho))
+            encerrarColeta()
         }
 
         btnDownload.setOnClickListener {
@@ -97,6 +95,17 @@ class MainActivity : AppCompatActivity() {
             tvStatus.setTextColor(ContextCompat.getColor(this, R.color.verde))
         } catch (e: SecurityException) {
             Toast.makeText(this, "Permissão não concedida!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun encerrarColeta() {
+        try {
+            locationManager.removeUpdates(locationListener)
+            tvStatus.text = "Status: Encerrado"
+            tvStatus.setTextColor(ContextCompat.getColor(this, R.color.vermelho))
+            Toast.makeText(this, "Coleta encerrada com sucesso.", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Erro ao encerrar a coleta.", Toast.LENGTH_SHORT).show()
         }
     }
 }
