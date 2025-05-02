@@ -5,6 +5,8 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
@@ -21,8 +23,12 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private lateinit var tvStatus: TextView
+    private lateinit var tvCronometro: TextView
     private lateinit var locationManager: LocationManager
     private val locationList = mutableListOf<Location>()
+    private var tempoInicial: Long = 0L
+    private var handler = Handler(Looper.getMainLooper())
+    private var isColetando = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +46,8 @@ class MainActivity : AppCompatActivity() {
         tvStatus = findViewById(R.id.tv_status)
         tvStatus.text = "Status: $status"
 
+        tvCronometro = findViewById(R.id.tv_cronometro)
+
         val btnIniciar = findViewById<Button>(R.id.btn_iniciar)
         val btnEncerrar = findViewById<Button>(R.id.btn_encerrar)
         val btnDownload = findViewById<Button>(R.id.btn_download)
@@ -48,10 +56,22 @@ class MainActivity : AppCompatActivity() {
             locationPermissionRequest.launch(
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
             )
+            tempoInicial = System.currentTimeMillis()
+            isColetando = true
+            handler.post(atualizadorTempo)
+            tvCronometro.setTextColor(ContextCompat.getColor(this, R.color.verde))
         }
 
         btnEncerrar.setOnClickListener {
             encerrarColeta()
+            isColetando = false
+            handler.removeCallbacks(atualizadorTempo)
+
+            val tempoTotal = System.currentTimeMillis() - tempoInicial
+            val minutos = (tempoTotal / 1000) / 60
+            val segundos = (tempoTotal / 1000) % 60
+            tvCronometro.text = String.format("Tempo total: %02d:%02d", minutos, segundos)
+            tvCronometro.setTextColor(ContextCompat.getColor(this, R.color.vermelho))
         }
 
         btnDownload.setOnClickListener {
@@ -67,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                 tvStatus.setTextColor(ContextCompat.getColor(this, R.color.azul))
                 compartilharArquivo(file)
             }
+            tvCronometro.text = ""
         }
 
     }
@@ -106,6 +127,7 @@ class MainActivity : AppCompatActivity() {
             )
             tvStatus.text = "Status: Iniciado"
             tvStatus.setTextColor(ContextCompat.getColor(this, R.color.verde))
+
         } catch (e: SecurityException) {
             Toast.makeText(this, "Permissão não concedida!", Toast.LENGTH_LONG).show()
         }
@@ -172,6 +194,19 @@ class MainActivity : AppCompatActivity() {
 
         startActivity(Intent.createChooser(intent, "Compartilhar arquivo GPX"))
     }
+
+    private val atualizadorTempo = object : Runnable {
+        override fun run() {
+            if (isColetando) {
+                val tempoDecorrido = System.currentTimeMillis() - tempoInicial
+                val minutos = (tempoDecorrido / 1000) / 60
+                val segundos = (tempoDecorrido / 1000) % 60
+                tvCronometro.text = String.format("Tempo: %02d:%02d", minutos, segundos)
+                handler.postDelayed(this, 1000)
+            }
+        }
+    }
+
 
 }
 
